@@ -26,7 +26,7 @@ class Vendor(models.Model):
         return self.name
     
 class PurchaseOrder(models.Model):
-    po_number = models.CharField(max_length=50)
+    po_number = models.CharField(max_length=200,null=True,blank=True)
     vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE,blank=True,null=True)
     order_date = models.DateTimeField(auto_now_add=True)
     delivery_date = models.DateTimeField()
@@ -40,18 +40,20 @@ class PurchaseOrder(models.Model):
     )
     status = models.CharField(max_length=50,choices=status_coices,default="pending")
 
-    quality_rating = models.FloatField(null=True,blank=True)
+    quality_rating = models.FloatField(null=True,blank=True,default=0)
     issue_date = models.DateTimeField()
-    acknowledgment_date = models.DateTimeField(null=True,blank=True)
+    acknowledgement_date = models.DateTimeField(null=True,blank=True)
 
     def save(self,*args,**kwargs):
         if not self.po_number:
             while True:
                 po_num = uuid.uuid4().hex[:8]
+                print(f'\n\n\n\n\n\n\n{po_num}')
                 try:
-                    PurchaseOrder.objects.get(po_num=po_num)
+                    PurchaseOrder.objects.get(po_number=po_num)
                 except PurchaseOrder.DoesNotExist:
-                    self.po_number = po_num
+                    print(f'\n\n\n\n\n\n\n{po_num}')
+                    self.po_number = f"PO-{po_num}"
                     break
         super().save(*args,**kwargs)
 
@@ -66,5 +68,5 @@ class HistoricalPerformace(models.Model):
     average_response_time = models.FloatField(default=0)
     fulfillment_rate = models.FloatField(default=0)
 
-    def __str__(self):
-        return self.fulfillment_rate
+    # def __str__(self):
+    #     return self.id
